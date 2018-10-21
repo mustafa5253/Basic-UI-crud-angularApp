@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
 
   public isLoggedIn = false;
 
-  constructor (private route: Router, private _localStorage: StorageService) {
+  constructor(private route: Router, private _localStorage: StorageService) {
 
   }
 
@@ -26,7 +26,6 @@ export class AppComponent implements OnInit {
       this.isLoggedIn = true;
     }
   }
-
 
   public logout() {
     localStorage.removeItem('mobile');

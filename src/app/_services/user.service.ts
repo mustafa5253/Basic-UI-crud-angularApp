@@ -9,6 +9,7 @@ import { StorageService } from './storage.service';
 @Injectable()
 
 export class UserService {
+  public isLoggedIn: boolean = false;
   private upersons= [];
 
   constructor(private _http: HttpClient, private _localStorage: StorageService) {}
@@ -23,7 +24,7 @@ export class UserService {
   }
 
   public updateUser(mobile, user) {
-    const index: any = _.findIndex(this.upersons, (u: IUser) => {
+    let index: any = _.findIndex(this.upersons, (u: IUser) => {
       return u.id === user.id;
     });
     this.upersons[index] = user;
@@ -34,4 +35,10 @@ export class UserService {
     this.upersons.splice(this.upersons.indexOf(user), 1);
     this._localStorage.setItem('users', this.upersons);
   }
+
+  public logOut() {
+    this._localStorage.removeItem('mobile');
+    this.isLoggedIn = false;
+  }
+
 }

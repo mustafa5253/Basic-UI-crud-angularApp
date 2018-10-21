@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
     //
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     if (localStorage.getItem('mobile')) {
       this.router.navigate(['users']);
     }

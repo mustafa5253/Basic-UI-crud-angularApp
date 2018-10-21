@@ -13,8 +13,11 @@ import { DropzoneComponent , DropzoneDirective, DropzoneConfigInterface } from '
 })
 
 export class UserComponent implements OnInit {
-  @ViewChild(DropzoneComponent) componentRef: DropzoneComponent;
-  @ViewChild(DropzoneComponent) directiveRef: DropzoneDirective;
+  @ViewChild(DropzoneComponent) public componentRef: DropzoneComponent;
+  @ViewChild(DropzoneComponent) public directiveRef: DropzoneDirective;
+  @ViewChild('confirmationModal') public confirmationModal: ModalDirective;
+  @ViewChild('userFormModal') public userFormModal: ModalDirective;
+
   public usersStream$: Observable<IUser[]>;
 
   public userForm: FormGroup;
@@ -41,10 +44,6 @@ export class UserComponent implements OnInit {
 
   private userMobile: string;
 
-
-  @ViewChild('confirmationModal') public confirmationModal: ModalDirective;
-  @ViewChild('userFormModal') public userFormModal: ModalDirective;
-
   constructor(
     private _fb: FormBuilder,
     private _userService: UserService
@@ -64,7 +63,7 @@ export class UserComponent implements OnInit {
     });
   }
 
-  private createUserForm() {
+  public createUserForm() {
     return this._fb.group({
       name: ['', Validators.required],
       mobile: ['', Validators.required],
@@ -76,7 +75,7 @@ export class UserComponent implements OnInit {
     });
   }
 
-  private getAllUsers(mobile: string) {
+  public getAllUsers(mobile: string) {
     this.allUsers = this._userService.getAllUsers(mobile);
     this.usersStream$ = Observable.of(this.allUsers);
   }
