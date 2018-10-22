@@ -78,6 +78,8 @@
   
   .dropzone-container {
     height: 100%;
-    max-width: 130px;
   }
   
+  .dropzone-container > .dropzone.dz-wrapper.dz-single .dz-preview {
+    max-width: 130px;
+  }

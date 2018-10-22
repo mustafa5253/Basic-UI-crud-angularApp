@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
   }
 
   public saveMobileNumber() {
-    const mobile = this.loginForm.get('mobile').value;
+    let mobile = this.loginForm.get('mobile').value;
     localStorage.setItem('mobile', mobile);
     this.router.navigate(['users']);
   }

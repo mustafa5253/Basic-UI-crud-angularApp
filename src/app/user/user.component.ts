@@ -51,7 +51,7 @@ export class UserComponent implements OnInit {
     this.userForm = this.createUserForm();
   }
 
-  ngOnInit() {
+  public ngOnInit() {
 
     this.userMobile = localStorage.getItem('mobile');
 

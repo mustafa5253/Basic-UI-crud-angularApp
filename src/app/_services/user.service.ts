@@ -15,7 +15,11 @@ export class UserService {
   constructor(private _http: HttpClient, private _localStorage: StorageService) {}
 
   public getAllUsers(mobile: string) {
-    return this.upersons = this._localStorage.getItem('users');
+    this.upersons = this._localStorage.getItem('users');
+    if (!this.upersons) {
+      return this.upersons = [];
+    }
+    return  this.upersons;
   }
 
   public createUser(mobile, user) {
