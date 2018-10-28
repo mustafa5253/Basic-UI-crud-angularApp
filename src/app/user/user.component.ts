@@ -1,18 +1,18 @@
 // tslint:disable-next-line:import-blacklist
 import { Observable } from 'rxjs';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import { IUser } from '../_interface/User';
 import { ModalDirective } from 'ngx-bootstrap';
 import { UserService } from '../_services/user.service';
-import { DropzoneComponent , DropzoneDirective, DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
+import { DropzoneComponent, DropzoneDirective, DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
 @Component({
   selector: 'app-user-component',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.css']
 })
 
-export class UserComponent implements OnInit {
+export class UserComponent implements OnInit, OnDestroy {
   @ViewChild(DropzoneComponent) public componentRef: DropzoneComponent;
   @ViewChild(DropzoneComponent) public directiveRef: DropzoneDirective;
   @ViewChild('confirmationModal') public confirmationModal: ModalDirective;
@@ -65,34 +65,32 @@ export class UserComponent implements OnInit {
 
   public createUserForm() {
     return this._fb.group({
+      id: [''],
       name: ['', Validators.required],
       mobile: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      city: '',
-      hobbies: '',
-      address: ['', Validators.required],
+      city: ['', Validators.required],
+      hobbies: [''],
+      address: ['', [Validators.required, Validators.minLength(10)]],
       avatar: ['']
     });
   }
 
   public getAllUsers(mobile: string) {
-    this.allUsers = this._userService.getAllUsers(mobile);
-    this.usersStream$ = Observable.of(this.allUsers);
+    this.usersStream$ = this._userService.getAllUsers(mobile);
+    debugger;
+    // this.usersStream$ = Observable.of(this.allUsers);
   }
 
   public onSubmit(data) {
     if (this.operationType === 'Update') {
-      this._userService.updateUser(this.userMobile, data.value);
-        this.userFormModal.hide();
-        this.componentRef.directiveRef.reset();
-        this.getAllUsers(this.userMobile);
+      this.updateUser(this.userMobile, data.value);
     } else {
       this._userService.createUser(this.userMobile, data.value);
-        this.userFormModal.hide();
-        this.componentRef.directiveRef.reset();
-        this.getAllUsers(this.userMobile);
+      this.getAllUsers(this.userMobile);
     }
-
+    this.userFormModal.hide();
+    this.componentRef.directiveRef.reset();
   }
 
   public onUpdateUser(user: IUser) {
@@ -108,8 +106,8 @@ export class UserComponent implements OnInit {
   public onConfirmation(data: boolean) {
     this.confirmationModal.hide();
     if (data) {
-      this._userService.deleteUser(this.userMobile, this.selectedUser);
-        this.getAllUsers(this.userMobile);
+      this._userService.deleteUser(this.userMobile, this.selectedUser.id, this.selectedUser);
+      // this.getAllUsers(this.userMobile);
     }
   }
 
@@ -133,6 +131,23 @@ export class UserComponent implements OnInit {
   }
 
   public onUploadError(ev) {
-      console.log('The error ev is :', ev);
+    console.log('The error ev is :', ev);
   }
+
+  /**
+   * updateUser
+   */
+  public updateUser(mobile, data) {
+    this._userService.updateUser(this.userMobile, data).subscribe((res) => {
+      debugger;
+    });
+  }
+
+  /**
+   * ngOnDestroy
+   */
+  public ngOnDestroy() {
+    //
+  }
+
 }

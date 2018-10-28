@@ -7,15 +7,17 @@
 
 // @Injectable()
 // export class ErrorInterceptor implements HttpInterceptor {
-//     constructor(private userService: UserService) {}
+//   constructor(private userService: UserService) { }
 
-//     public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-//         return next.handle(request).pipe(catchError(err => {
-//             if (err.status === 401) {
-//                 this.userService.logOut();
-//                 location.reload(true);
-//             }
+//   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+//     return next.handle(request).pipe(catchError(err => {
+//       if (err.status === 401) {
+//         this.userService.logOut();
+//         location.reload(true);
+//       }
 
-//         }));
-//     }
+//       let error = err.error.message || err.statusText;
+//       return throwError(error);
+//     }));
+//   }
 // }

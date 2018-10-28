@@ -5,39 +5,47 @@ import { USER_PERSONS } from '../db/user.data';
 import { IUser } from '../_interface/User';
 import * as _ from 'lodash';
 import { StorageService } from './storage.service';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable()
 
 export class UserService {
   public isLoggedIn: boolean = false;
-  private upersons= [];
+  public users = [];
 
-  constructor(private _http: HttpClient, private _localStorage: StorageService) {}
+  constructor(private _http: HttpClient, private _localStorage: StorageService) { }
 
-  public getAllUsers(mobile: string) {
-    this.upersons = this._localStorage.getItem('users');
-    if (!this.upersons) {
-      return this.upersons = [];
-    }
-    return  this.upersons;
+  public getAllUsers(mobile: string): any {
+    return this._http.get('http://localhost:3000/users').pipe(map((res) => {
+      let data: any = res;
+      return data;
+    }));
   }
 
-  public createUser(mobile, user) {
-    this.upersons.push(user);
-    this._localStorage.setItem('users', this.upersons);
+  public createUser(mobile, user): any {
+    return this._http.post('http://localhost:3000/users', user).pipe(map((res) => {
+      let data: any = res;
+      return data;
+    }));
   }
 
-  public updateUser(mobile, user) {
-    let index: any = _.findIndex(this.upersons, (u: IUser) => {
-      return u.id === user.id;
-    });
-    this.upersons[index] = user;
-    this._localStorage.setItem('users', this.upersons);
+  public updateUser(mobile, user): any {
+    return this._http.put('http://localhost:3000/users', user).pipe(map((res) => {
+      let data: any = res;
+      return data;
+    }));
   }
 
-  public deleteUser(mobile, user) {
-    this.upersons.splice(this.upersons.indexOf(user), 1);
-    this._localStorage.setItem('users', this.upersons);
+  public deleteUser(mobile, userId, user) {
+    debugger;
+    return this._http.delete('http://localhost:3000/users/' + userId).pipe(map((res) => {
+      debugger;
+      console.log(res);
+      return res;
+    }));
+
+    // this.users.splice(this.users.indexOf(user), 1);
+    // this._localStorage.setItem('users', this.users);
   }
 
   public logOut() {

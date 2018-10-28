@@ -80,6 +80,9 @@
     height: 100%;
   }
   
-  .dropzone-container > .dropzone.dz-wrapper.dz-single .dz-preview {
-    max-width: 130px;
+  .has-error {
+   border: 1px solid #dc3545; 
+  }
+  label sup {
+    color: #dc3545;
   }

@@ -1,4 +1,3 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { ModalModule } from 'ngx-bootstrap';
 
@@ -16,15 +15,15 @@ import { CommonModule } from '@angular/common';
 import { StorageService } from '../_services/storage.service';
 import { AuthGuard } from '../_guards/auth.guard';
 import { UserService } from '../_services/user.service';
-
+import { UserRoutingModule } from './user.routing.module';
 
 const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
-    url: 'https://httpbin.org/post',
-    acceptedFiles: 'image/*',
-    createImageThumbnails: true,
-    addRemoveLinks: true,
-    maxFiles: 1
-  };
+  url: 'https://httpbin.org/post',
+  acceptedFiles: 'image/*',
+  createImageThumbnails: true,
+  addRemoveLinks: true,
+  maxFiles: 1
+};
 
 @NgModule({
   declarations: [
@@ -32,21 +31,21 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
     ConfirmationComponent,
   ],
   imports: [
-    BrowserModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     ModalModule.forRoot(),
     HttpClientModule,
     Ng2OrderModule,
-    DropzoneModule
+    DropzoneModule,
+    UserRoutingModule
   ],
   providers: [
-      UserService, AuthGuard, StorageService,
+    UserService, AuthGuard, StorageService,
     {
-        provide: DROPZONE_CONFIG,
-        useValue: DEFAULT_DROPZONE_CONFIG
+      provide: DROPZONE_CONFIG,
+      useValue: DEFAULT_DROPZONE_CONFIG
     }
-    ],
+  ],
 })
 export class UserModule { }

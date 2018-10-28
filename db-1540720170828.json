@@ -1,0 +1,52 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "demo user",
+      "avatar": "",
+      "email": "demo@gmail.com",
+      "city": "Indore",
+      "hobbies": "volleyball, reading",
+      "address": "63, Khatiwala Tank"
+    },
+    {
+      "id": 2,
+      "name": "demo user 1",
+      "avatar": "",
+      "email": "demo@gmail.com",
+      "city": "Indore",
+      "hobbies": "volleyball, reading",
+      "address": "63, Khatiwala Tank"
+    },
+    {
+      "id": 3,
+      "name": "Mustafa Bagwala",
+      "mobile": "",
+      "email": "mbagwala52@gmail.com",
+      "city": "Indore",
+      "hobbies": "",
+      "address": "63,Nandanvan Colony,Indore(M.P)",
+      "avatar": ""
+    },
+    {
+      "id": 4,
+      "name": "Mustafa Bagwala",
+      "mobile": "",
+      "email": "mbagwala52@gmail.com",
+      "city": "Indore",
+      "hobbies": "",
+      "address": "Heena apt. 301\n63,Nandanvan Colony, near brook bond colony",
+      "avatar": ""
+    },
+    {
+      "id": 5,
+      "name": "Mustafa Bagwala",
+      "mobile": "",
+      "email": "mbagwala52@gmail.com",
+      "city": "Indore",
+      "hobbies": "",
+      "address": "63,Nandanvan Colony,Indore(M.P)",
+      "avatar": ""
+    }
+  ]
+}
