@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from './_services/storage.service';
-
+import { UserService } from './_services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
 
   public isLoggedIn = false;
 
-  constructor(private route: Router, private _localStorage: StorageService) {
+  constructor(private _userService: UserService) {
 
   }
 
@@ -21,15 +21,9 @@ export class AppComponent implements OnInit {
    * ngOnInit
    */
   public ngOnInit() {
-    const loginStatus = this._localStorage.getItem('mobile');
-    if (loginStatus) {
-      this.isLoggedIn = true;
-    }
+    this._userService.isLoggedIn$.subscribe((a) => {
+        this.isLoggedIn = a;
+    });
   }
 
-  public logout() {
-    localStorage.removeItem('mobile');
-    this.isLoggedIn = false;
-    this.route.navigate(['/login']);
-  }
 }

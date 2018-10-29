@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpHeaders } from '@angular/common/http';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
     public headers: HttpHeaders;
+
     public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        // append headers
         this.headers = new HttpHeaders();
-        this.headers.set('Content-Type', 'application/jsonwa');
+        this.headers.set('Content-Type', 'application/json');
         this.headers.set('Access-Control-Allow-Origin', '*');
         this.headers.set('Access-Control-Allow-Headers', 'Origin, Authorization, Content-Type, Accept');
 
         request = request.clone({
             headers: this.headers
         });
-        // add authorization header with jwt token if available
+
         let currentUser = JSON.parse(localStorage.getItem('mobile'));
         request = request.clone({
             setHeaders: {
@@ -23,6 +24,16 @@ export class JwtInterceptor implements HttpInterceptor {
             }
         });
 
-        return next.handle(request);
+        return next.handle(request).pipe(
+            tap(event => {
+              if (event instanceof HttpResponse) {
+                console.log(event.status);
+              }
+            }, error => {
+                   // http response status code
+                  console.log('response');
+                  console.error(error.message);
+            })
+          );
     }
 }

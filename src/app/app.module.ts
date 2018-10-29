@@ -20,11 +20,14 @@ import { StorageService } from './_services/storage.service';
     FormsModule,
     ReactiveFormsModule,
     ModalModule.forRoot(),
-    // UserModule,
     HttpClientModule,
     AppRoutingModule,
   ],
-  providers: [UserService, AuthGuard, StorageService],
+  providers: [
+    StorageService,
+    AuthGuard,
+    UserService,
+    ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

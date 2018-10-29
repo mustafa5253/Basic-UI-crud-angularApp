@@ -6,7 +6,7 @@ export class AuthGuard implements CanActivate {
 
   constructor(public router: Router) {}
 
-  canActivate(): boolean {
+  public canActivate(): boolean {
     if (localStorage.getItem('mobile')) {
       return true;
     } else {

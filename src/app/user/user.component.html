@@ -1,122 +1,127 @@
 <div class="row" style="padding-bottom: 10px;padding-top: 15px;">
-  <div class="col-2">
-    <input class="form-control mr-sm-2" [formControl]="searchText" type="text" placeholder="Search users" aria-label="Search">
-  </div>
-  <div class="text-right col-10">
-    <button class="btn btn-success" (click)="createNewUser()">Add new</button>
-  </div>
+    <div class="col-2">
+        <input class="form-control mr-sm-2" [formControl]="searchText" type="text" placeholder="Search users" aria-label="Search">
+    </div>
+    <div class="col-2">
+        <button class="btn btn-success" (click)="createNewUser()">Add new</button>
+    </div>
+    <div class="text-right col-8">
+        <button class="btn btn-default" (click)="logout()">Logout</button>
+    </div>
 </div>
 <table class="table table-bordered">
-  <thead>
-    <tr>
-      <th>Image</th>
-      <th (click)="sort('name')">Name
-        <span class="glyphicon sort-icon" *ngIf="key =='name'" [ngClass]="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
-      </th>
-      <th (click)="sort('email')">Email
-        <span class="glyphicon sort-icon" *ngIf="key =='name'" [ngClass]="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
-      </th>
-      <th (click)="sort('city')">City
-        <span class="glyphicon sort-icon" *ngIf="key =='name'" [ngClass]="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
-      </th>
-      <th (click)="sort('hobbies')">Hobbies</th>
-      <th (click)="sort('address')">Address</th>
-      <th width="200px">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let user of (usersStream$ | async) | orderBy: key : reverse; let i = index">
-      <td>
-
-        <img [src]="user.avatar" class="img-thumb" />
-      </td>
-      <td>{{user.name}}</td>
-      <td>{{user.email}}</td>
-      <td>{{user.city}}</td>
-      <td>{{user.hobbies}}</td>
-      <td>{{user.address}}</td>
-      <td>
-        <button class="btn btn-info btn-sm" (click)="onUpdateUser(user);userFormModal.show()">Update</button>
-        <button class="btn btn-danger btn-sm" (click)="onDeleteUser(user);confirmationModal.show()">Delete</button>
-      </td>
-    </tr>
-    <tr *ngIf="!(usersStream$ | async)">
-      <td colspan="7" class="text-center">No User Found</td>
-    </tr>
-  </tbody>
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th (click)="sort('name')">Name
+                <span class="fa fa-sort"></span>
+            </th>
+            <th (click)="sort('email')">Email
+                <span class="fa fa-sort"></span>
+            </th>
+            <th (click)="sort('city')">City
+                <span class="fa fa-sort"></span>
+            </th>
+            <th (click)="sort('hobbies')">Hobbies
+                <span class="fa fa-sort"></span>
+            </th>
+            <th (click)="sort('address')">Address
+                <span class="fa fa-sort"></span>
+            </th>
+            <th width="200px">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let user of (usersStream$ | async) | orderBy: key : reverse; let i = index">
+            <td>
+                <ng-container *ngIf="user.avatar">
+                    <img [src]="user.avatar" class="img-thumb" />
+                </ng-container>
+                <ng-container *ngIf="!user.avatar">
+                    <p>No Image</p>
+                </ng-container>
+            </td>
+            <td>{{user.name}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.city}}</td>
+            <td>{{user.hobbies}}</td>
+            <td>{{user.address}}</td>
+            <td>
+                <button class="btn btn-info btn-sm" (click)="onUpdateUser(user);userFormModal.show()">Update</button>
+                <button class="btn btn-danger btn-sm" (click)="onDeleteUser(user);confirmationModal.show()">Delete</button>
+            </td>
+        </tr>
+        <tr *ngIf="!(usersStream$ | async)">
+            <td colspan="7" class="text-center">No User Found</td>
+        </tr>
+    </tbody>
 </table>
 
-<div class="modal" bsModal #userFormModal="bs-modal" [config]="{backdrop: 'static', animated: false}" tabindex="-1" role="dialog"
-  aria-labelledby="dialog-static-name">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form [formGroup]="userForm" (ngSubmit)="onSubmit(userForm)" autocomplete="off">
-        <div class="modal-header">
-          <h4 id="dialog-static-name" class="modal-title pull-left">{{operationType}} user</h4>
-          <button type="button" class="close pull-right" aria-label="Close" (click)="userFormModal.hide()">
+<div class="modal" bsModal #userFormModal="bs-modal" [config]="{backdrop: 'static', animated: false}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form [formGroup]="userForm" (ngSubmit)="onSubmit(userForm)" autocomplete="off">
+                <div class="modal-header">
+                    <h4 id="dialog-static-name" class="modal-title pull-left">{{operationType}} user</h4>
+                    <button type="button" class="close pull-right" aria-label="Close" (click)="userFormModal.hide()">
             <span aria-hidden="true">&times;</span>
           </button>
-        </div>
-        <div class="modal-body">
+                </div>
+                <div class="modal-body">
 
-          <div class="form-group">
-            <label for="name">Name:
+                    <div class="form-group">
+                        <label for="name">Name:
               <sup>*</sup>
             </label>
-            <input type="text" class="form-control" formControlName="name" [ngClass]="{'has-error': userForm.get('name').touched && userForm.get('name').hasError('required')}"
-            />
-            <p class="text-danger" *ngIf="userForm.get('name').touched && userForm.get('name').hasError('required')">
-              Please enter name!
-            </p>
-          </div>
-          <div class="form-group">
-            <label for="email">Email:
+                        <input type="text" class="form-control" formControlName="name" [ngClass]="{'has-error': userForm.get('name').touched && userForm.get('name').hasError('required')}" />
+                        <p class="text-danger" *ngIf="userForm.get('name').touched && userForm.get('name').hasError('required')">
+                            Please enter name!
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:
               <sup>*</sup>
             </label>
-            <input type="email" class="form-control" formControlName="email" [ngClass]="{'has-error': userForm.get('email').touched && userForm.get('email').hasError('required')}"
-            />
-            <p class="text-danger" *ngIf="userForm.get('email').touched && userForm.get('email').hasError('required')">
-              Please enter email id.
-            </p>
-          </div>
-          <div class="form-group">
-            <label for="city">City:
+                        <input type="email" class="form-control" formControlName="email" [ngClass]="{'has-error': userForm.get('email').touched && userForm.get('email').hasError('required')}" />
+                        <p class="text-danger" *ngIf="userForm.get('email').touched && userForm.get('email').hasError('required')">
+                            Please enter email id.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City:
               <sup>*</sup>
             </label>
-            <input type="text" class="form-control" formControlName="city" [ngClass]="{'has-error': userForm.get('city').touched && userForm.get('city').hasError('required')}"
-            />
-            <p class="text-danger" *ngIf="userForm.get('city').touched && userForm.get('city').hasError('required')">
-              Please enter city.
-            </p>
-          </div>
-          <div class="form-group">
-            <label for="hobbies">Hobbies:</label>
-            <input type="text" class="form-control" formControlName="hobbies" />
-          </div>
-          <div class="form-group">
-            <label for="address">Address:
+                        <input type="text" class="form-control" formControlName="city" [ngClass]="{'has-error': userForm.get('city').touched && userForm.get('city').hasError('required')}" />
+                        <p class="text-danger" *ngIf="userForm.get('city').touched && userForm.get('city').hasError('required')">
+                            Please enter city.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="hobbies">Hobbies:</label>
+                        <input type="text" class="form-control" formControlName="hobbies" />
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address:
               <sup>*</sup>
             </label>
-            <textarea type="text" class="form-control" formControlName="address" [ngClass]="{'has-error': userForm.get('address').touched && userForm.get('address').hasError('required')}"></textarea>
-            <p class="text-danger" *ngIf="userForm.get('address').touched && userForm.get('address').hasError('required')">
-              Please enter address.
-            </p>
-          </div>
-          <div class="form-group">
-            <label for="address">Upload Image:</label>
-            <dropzone class="dropzone-container" [config]="config" [message]="'Click or drag images here to upload'" (error)="onUploadError($event)"
-              (success)="onUploadSuccess($event)"></dropzone>
-          </div>
+                        <textarea type="text" class="form-control" formControlName="address" [ngClass]="{'has-error': userForm.get('address').touched && userForm.get('address').hasError('required')}"></textarea>
+                        <p class="text-danger" *ngIf="userForm.get('address').touched && userForm.get('address').hasError('required')">
+                            Please enter address.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Upload Image:</label>
+                        <dropzone class="dropzone-container" [config]="configData" [message]="'Click or drag images here to upload'" (error)="onUploadError($event)" (success)="onUploadSuccess($event)"></dropzone>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-block" [disabled]="userForm.invalid">Submit</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary btn-block" [disabled]="userForm.invalid">Submit</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 
-<div class="modal" bsModal #confirmationModal="bs-modal" [config]="{backdrop: 'static', animated: false}" tabindex="-1" role="dialog"
-  aria-labelledby="dialog-static-name">
-  <app-confirmation-component [confirmationMessage]="confirmationMessage" (userChoice)="onConfirmation($event)"></app-confirmation-component>
+<div class="modal" bsModal #confirmationModal="bs-modal" [config]="{backdrop: 'static', animated: false}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+    <app-confirmation-component [confirmationMessage]="confirmationMessage" (userChoice)="onConfirmation($event, selectedUser)"></app-confirmation-component>
 </div>

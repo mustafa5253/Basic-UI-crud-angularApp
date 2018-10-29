@@ -1,13 +1,10 @@
 <nav class="navbar navbar-dark fixed-top bg-dark">
-<!-- Brand and toggle get grouped for better mobile display -->
-<div class="navbar-header">
-  <a class="navbar-brand" href="#">Angular App</a>
-</div>
-<div class="navbar-left" *ngIf="isLoggedIn">
-  <button class="btn btn-default" (click)="logout()">Logout</button>
-</div>
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">Angular App</a>
+    </div>
 </nav>
 
 <div class="container-fluid" style="padding-top: 65px;">
-  <router-outlet></router-outlet>
+    <router-outlet></router-outlet>
 </div>

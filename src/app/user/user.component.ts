@@ -1,11 +1,15 @@
 // tslint:disable-next-line:import-blacklist
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
 import { IUser } from '../_interface/User';
 import { ModalDirective } from 'ngx-bootstrap';
 import { UserService } from '../_services/user.service';
 import { DropzoneComponent, DropzoneDirective, DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
+import * as _ from 'lodash';
+import { StorageService } from '../_services/storage.service';
+
 @Component({
   selector: 'app-user-component',
   templateUrl: './user.component.html',
@@ -18,7 +22,7 @@ export class UserComponent implements OnInit, OnDestroy {
   @ViewChild('confirmationModal') public confirmationModal: ModalDirective;
   @ViewChild('userFormModal') public userFormModal: ModalDirective;
 
-  public usersStream$: Observable<IUser[]>;
+  public usersStream$: Observable<IUser[]> = Observable.of([]);
 
   public userForm: FormGroup;
 
@@ -28,8 +32,9 @@ export class UserComponent implements OnInit, OnDestroy {
 
   public confirmationMessage: string;
 
-  // sorting
-  public key = 'name'; // set default
+  public selectedUser: IUser;
+
+  public key = 'name';
   public reverse = false;
 
   public showPreview = false;
@@ -40,13 +45,15 @@ export class UserComponent implements OnInit, OnDestroy {
 
   private allUsers = [];
 
-  private selectedUser: IUser;
-
   private userMobile: string;
+
+  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(
     private _fb: FormBuilder,
-    private _userService: UserService
+    private _userService: UserService,
+    private _localStorage: StorageService,
+    private _route: Router
   ) {
     this.userForm = this.createUserForm();
   }
@@ -55,7 +62,12 @@ export class UserComponent implements OnInit, OnDestroy {
 
     this.userMobile = localStorage.getItem('mobile');
 
-    this.getAllUsers(this.userMobile);
+    this.getAllUsers();
+
+    this.usersStream$.subscribe(users => {
+      this.allUsers = users;
+      this._localStorage.setItem('users', this.allUsers);
+    });
 
     this.searchText.valueChanges.subscribe(value => {
       const filteredUsers = this.allUsers.filter((user: IUser) => user.name.toLowerCase().includes(value));
@@ -63,31 +75,34 @@ export class UserComponent implements OnInit, OnDestroy {
     });
   }
 
+  // add new user form
   public createUserForm() {
     return this._fb.group({
-      id: [''],
+      // id: [''],
       name: ['', Validators.required],
-      mobile: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', Validators.required],
       city: ['', Validators.required],
       hobbies: [''],
-      address: ['', [Validators.required, Validators.minLength(10)]],
+      address: ['', Validators.required],
       avatar: ['']
     });
   }
 
-  public getAllUsers(mobile: string) {
-    this.usersStream$ = this._userService.getAllUsers(mobile);
-    debugger;
-    // this.usersStream$ = Observable.of(this.allUsers);
+  // Get all user
+  public getAllUsers() {
+    this.usersStream$ = this._userService.getAllUsers();
   }
 
+  // on submit form
   public onSubmit(data) {
     if (this.operationType === 'Update') {
-      this.updateUser(this.userMobile, data.value);
+      this.updateUser(data.value);
     } else {
-      this._userService.createUser(this.userMobile, data.value);
-      this.getAllUsers(this.userMobile);
+      this._userService.createUser(data.value).subscribe((res) => {
+        this.allUsers.push(res);
+        this.usersStream$ = Observable.of(this.allUsers);
+        alert('User created succesfully');
+      });
     }
     this.userFormModal.hide();
     this.componentRef.directiveRef.reset();
@@ -98,19 +113,37 @@ export class UserComponent implements OnInit, OnDestroy {
     this.userForm = this._fb.group(user);
   }
 
+  public updateUser(data) {
+    this._userService.updateUser(data).subscribe((res) => {
+    let index: any = _.findIndex(this.allUsers, (u: IUser) => {
+      return u.id === res.id;
+    });
+    this.allUsers[index] = res;
+    this.usersStream$ = Observable.of(this.allUsers);
+      alert('User updated succesfully');
+    });
+  }
+
+  // Delete user
   public onDeleteUser(user: IUser) {
-    this.selectedUser = user;
+    this.selectedUser = _.cloneDeep(user);
     this.confirmationMessage = 'Are you sure want to delete?';
   }
 
-  public onConfirmation(data: boolean) {
-    this.confirmationModal.hide();
+  // confirmation modal
+  public onConfirmation(data: boolean, user) {
+    let selectedUser = _.cloneDeep(user);
     if (data) {
-      this._userService.deleteUser(this.userMobile, this.selectedUser.id, this.selectedUser);
-      // this.getAllUsers(this.userMobile);
+      this._userService.deleteUser(selectedUser.id, selectedUser).subscribe((res) => {
+      if (res) {
+        this.allUsers.splice(this.allUsers.indexOf(selectedUser), 1);
+        this.usersStream$ = Observable.of(this.allUsers);
+        }
+      });
     }
   }
 
+  // init new user form
   public createNewUser() {
     this.userFormModal.show();
     this.operationType = 'Create';
@@ -118,15 +151,15 @@ export class UserComponent implements OnInit, OnDestroy {
     this.selectedUser = null;
   }
 
+  // sort in table
   public sort(key) {
     this.key = key;
     this.reverse = !this.reverse;
   }
 
+  // upload image
   public onUploadSuccess(ev) {
-    // debugger;
     this.userForm.get('avatar').patchValue(ev[0].dataURL);
-    // console.log('The success ev is :', ev);
     this.showPreview = true;
   }
 
@@ -134,20 +167,15 @@ export class UserComponent implements OnInit, OnDestroy {
     console.log('The error ev is :', ev);
   }
 
-  /**
-   * updateUser
-   */
-  public updateUser(mobile, data) {
-    this._userService.updateUser(this.userMobile, data).subscribe((res) => {
-      debugger;
-    });
+  public logout() {
+    localStorage.removeItem('mobile');
+    // this.isLoggedIn = false;
+    this._route.navigate(['/login']);
   }
 
-  /**
-   * ngOnDestroy
-   */
   public ngOnDestroy() {
-    //
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
   }
 
 }
